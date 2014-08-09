@@ -87,6 +87,10 @@ public class Bone {
 			b.calculateRecursive();
 		}
 	}
+	
+	public float getLength() {
+		return length;
+	}
 
 	public List<Bone> getChildren() {
 		return children;
@@ -98,6 +102,10 @@ public class Bone {
 
 	public Vector3D getBoneEnd() {
 		return boneEnd;
+	}
+	
+	public Vector3D getDirection() {
+		return boneEnd.clone().subtract(boneStart).normalize();
 	}
 
 	public TransMatrix getLocalToWorld() {

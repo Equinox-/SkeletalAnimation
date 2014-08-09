@@ -25,6 +25,7 @@ import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 
 import com.pi.math.Quaternion;
+import com.pi.math.Vector3D;
 import com.pi.skeleton.Bone;
 import com.pi.skeleton.PoseableMesh;
 import com.pi.skeleton.Skeleton;
@@ -46,11 +47,11 @@ public class BoneDemo {
 		movements.add(new int[] { 20, Keyboard.KEY_R, Keyboard.KEY_F });
 		movements.add(new int[] { 21, Keyboard.KEY_T, Keyboard.KEY_G });
 		movements.add(new int[] { 22, Keyboard.KEY_Y, Keyboard.KEY_H });
-		
+
 		movements.add(new int[] { 2, Keyboard.KEY_U, Keyboard.KEY_J });
 		movements.add(new int[] { 3, Keyboard.KEY_I, Keyboard.KEY_K });
 		movements.add(new int[] { 4, Keyboard.KEY_O, Keyboard.KEY_L });
-		
+
 		Display.setDisplayMode(new DisplayMode(768, 768));
 		Display.create();
 		Skeleton sk = new Skeleton(new File("mesh.skl"));
@@ -65,7 +66,9 @@ public class BoneDemo {
 		GL11.glFrustum(-horizontalTan, horizontalTan, aspect * -horizontalTan,
 				aspect * horizontalTan, 1, 100000);
 		// GL11.glOrtho(-256, 256, -256, 256, -1000, 1000);
-		GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
+		GL11.glEnable(GL11.GL_CULL_FACE);
+		GL11.glPolygonMode(GL11.GL_FRONT, GL11.GL_LINE);
+		GL11.glCullFace(GL11.GL_BACK);
 
 		// glEnable(GL_LIGHTING);
 		glEnable(GL_COLOR_MATERIAL);
@@ -79,15 +82,19 @@ public class BoneDemo {
 		float yaw = 0;
 		float off = 10;
 		times = new float[movements.size()];
+
+		Vector3D trans = new Vector3D();
+
 		while (!Display.isCloseRequested()) {
 			GL11.glMatrixMode(GL11.GL_MODELVIEW);
 			GL11.glLoadIdentity();
 			GL11.glLight(GL_LIGHT0, GL_AMBIENT, l0_ambient);
 			GL11.glLight(GL_LIGHT0, GL_POSITION, l0_position);
 
-			GL11.glTranslatef(0, 0, -off);
+			GL11.glTranslatef(0, 0, -off/10f);
 			GL11.glRotatef(pitch, 1, 0, 0);
 			GL11.glRotatef(yaw, 0, 1, 0);
+			GL11.glTranslatef(-trans.x/100f, -trans.y/100f, -trans.z/100f);
 
 			GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 
@@ -118,6 +125,20 @@ public class BoneDemo {
 			}
 			if (Keyboard.isKeyDown(Keyboard.KEY_E)) {
 				off += 1;
+			}
+			if (Keyboard.isKeyDown(Keyboard.KEY_LEFT)) {
+				trans.x += Math.cos(Math.toRadians(yaw));
+				trans.z -= Math.sin(Math.toRadians(yaw));
+			}
+			if (Keyboard.isKeyDown(Keyboard.KEY_RIGHT)) {
+				trans.x -= Math.cos(Math.toRadians(yaw));
+				trans.z += Math.sin(Math.toRadians(yaw));
+			}
+			if (Keyboard.isKeyDown(Keyboard.KEY_UP)) {
+				trans.y++;
+			}
+			if (Keyboard.isKeyDown(Keyboard.KEY_DOWN)) {
+				trans.y--;
 			}
 			for (int q = 0; q < movements.size(); q++) {
 				int[] i = movements.get(q);
